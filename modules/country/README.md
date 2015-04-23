@@ -44,3 +44,16 @@ suppose to work with/for.
             Subdivision,
             Zip,
             module='country', type_='model')
+
+- register the module 'country' with the Models Country, Subdivision and Zip.
+
+### country.py
+
+    from trytond.model import ModelView, ModelSQL, fields
+    from trytond.pyson import Eval
+
+    __all__ = ['Country', 'Subdivision', 'Zip']
+
+- \_\_all\_\_ seems to be required, it contains all the Models.
+
+#### Country
