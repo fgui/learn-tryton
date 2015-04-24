@@ -68,6 +68,7 @@ suppose to work with/for.
 
 - Model Country is persisted (ModelSQL) and we have a view/form (ModelView).
 - It's name is country.country (Module country, model country)
+- By default the \_\_name\_\_ replacing "." with "_" will end up being the table name.
 
 ```python
         Name = fields.Char('Name', required=True, translate=True,
@@ -131,3 +132,43 @@ Referenced by:
     TABLE "country_zip" CONSTRAINT "country_zip_country_fkey" FOREIGN KEY (country) REFERENCES country_country(id) ON DELETE CASCADE
 Has OIDs: no
 ```
+
+- there are 2 indexes for code and name. ???
+PostgreSQL [docs](http://www.postgresql.org/docs/current/static/indexes-unique.html) seem to indicate that they will be the same index.
+- the unique where created with constraints part (cls.\_sql.\_sql\_constraints)
+- the others (guessing) where created because the select=True parameter field.Char.
+- TODO find out if there really are 2 indexes per name and code and if they are needed.
+- TODO find out how the table look like in SQLite
+
+```python
+    @classmethod
+    def search_rec_name(cls, name, clause):
+        if cls.search([('code',) + tuple(clause[1:])], limit=1):
+            return [('code',) + tuple(clause[1:])]
+        return [(cls._rec_name,) + tuple(clause[1:])]
+```
+
+- if the search by code returns just one element that's the search that we want to
+perform. Guessing that the search will be done twice.
+- rec_name => record name
+- overrides method on ModelStorage.
+- There is assume that there is a field "Name" that will be used for search by name,
+if "Name" does not exist it will use the surrogate id "id".
+- On ModelStorage :
+```python
+    rec_name = fields.Function(fields.Char('Name'), 'get_rec_name',
+            searcher='search_rec_name')
+
+    ...
+
+    @classmethod
+    def search_rec_name(cls, name, clause):
+        '''
+        Return a list of arguments for search on rec_name.
+        '''
+        rec_name = cls._rec_name
+        if rec_name not in cls._fields:
+            return []
+        return [(rec_name,) + tuple(clause[1:])]
+```
+- In ModelStorage by default it does all if no rec_name found or rec_name.
