@@ -6,7 +6,7 @@ a few of them.
 
 - It doesn't seem too complicated
 - It has few dependencies on other modules.
-- It is an official module.
+- It is an "official" module. Done by core developers of Tryton.
 - It does not require business knowledge. Everybody knows about countries.
 
 
