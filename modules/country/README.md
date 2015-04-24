@@ -79,17 +79,48 @@ suppose to work with/for.
 - translate = True -> translatable, value depends on language context.
 - note: no constraints yet. They will be defined next in a classmethod.
 
-        @classmethod
-        def __setup__(cls):
-           super(Country, cls).__setup__()
-           cls._sql_constraints += [
-               ('name_uniq', 'UNIQUE(name)',
-                   'The name of the country must be unique.'),
-               ('code_uniq', 'UNIQUE(code)',
-                   'The code of the country must be unique.'),
-                ]
-           cls._order.insert(0, ('name', 'ASC'))
+```python
+    @classmethod
+    def __setup__(cls):
+        super(Country, cls).__setup__()
+        cls._sql_constraints += [
+            ('name_uniq', 'UNIQUE(name)',
+                'The name of the country must be unique.'),
+            ('code_uniq', 'UNIQUE(code)',
+                'The code of the country must be unique.'),
+            ]
+        cls._order.insert(0, ('name', 'ASC'))
+```
 
 - override [ModelSQL./_/_setup/_/_](http://hg.tryton.org/trytond/file/10cfbb9153b6/trytond/model/modelsql.py)
+- hierarchy Model <- ModelStorage <- ModelSQL.
 - adds constraints unique name and code.
 - the "default" order will by first by 'name' and then 'id' (surrogate primary key added to all Models).
+
+
+##### Table created in PostgreSQL
+```
+                                                           Table "public.country_country"
+   Column    |              Type              |                          Modifiers                           | Storage  | Stats target | Description
+-------------+--------------------------------+--------------------------------------------------------------+----------+--------------+-------------
+ id          | integer                        | not null default nextval('country_country_id_seq'::regclass) | plain    |              |
+ create_uid  | integer                        |                                                              | plain    |              | Create User
+ code        | character varying(2)           | not null                                                     | extended |              | Code
+ create_date | timestamp(6) without time zone |                                                              | plain    |              | Create Date
+ name        | character varying              | not null                                                     | extended |              | Name
+ write_uid   | integer                        |                                                              | plain    |              | Write User
+ write_date  | timestamp(6) without time zone |                                                              | plain    |              | Write Date
+Indexes:
+    "country_country_pkey" PRIMARY KEY, btree (id)
+    "country_country_code_uniq" UNIQUE CONSTRAINT, btree (code)
+    "country_country_name_uniq" UNIQUE CONSTRAINT, btree (name)
+    "country_country_code_index" btree (code)
+    "country_country_name_index" btree (name)
+Foreign-key constraints:
+    "country_country_create_uid_fkey" FOREIGN KEY (create_uid) REFERENCES res_user(id) ON DELETE SET NULL
+    "country_country_write_uid_fkey" FOREIGN KEY (write_uid) REFERENCES res_user(id) ON DELETE SET NULL
+Referenced by:
+    TABLE "country_subdivision" CONSTRAINT "country_subdivision_country_fkey" FOREIGN KEY (country) REFERENCES country_country(id) ON DELETE RESTRICT
+    TABLE "country_zip" CONSTRAINT "country_zip_country_fkey" FOREIGN KEY (country) REFERENCES country_country(id) ON DELETE CASCADE
+Has OIDs: no
+```
