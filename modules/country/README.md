@@ -49,22 +49,27 @@ suppose to work with/for.
 
 ### country.py
 
+```python
     from trytond.model import ModelView, ModelSQL, fields
     from trytond.pyson import Eval
 
     __all__ = ['Country', 'Subdivision', 'Zip']
+```
 
 - \_\_all\_\_ defines the public names by a module in python. [Python reference](https://docs.python.org/2/reference/simple_stmts.html#the-import-statement).
 
 #### Country
 
+```python
     class Country(ModelSQL, ModelView):
         'Country'
         __name__ = 'country.country'
+```
 
 - Model Country is persisted (ModelSQL) and we have a view/form (ModelView).
 - It's name is country.country (Module country, model country)
 
+```python
         Name = fields.Char('Name', required=True, translate=True,
                help='The full name of the country.', select=True)
         code = fields.Char('Code', size=2, select=True,
@@ -72,6 +77,7 @@ suppose to work with/for.
               'You can use this field for quick search.', required=True)
         subdivisions = fields.One2Many('country.subdivision',
               'country', 'Subdivisions')
+```
 
 - The model has 3 fields name, code, subdivision.
 - Field definitions [Field api](http://doc.tryton.org/3.6/trytond/doc/ref/models/fields.html#ref-models-fields)
@@ -92,13 +98,14 @@ suppose to work with/for.
         cls._order.insert(0, ('name', 'ASC'))
 ```
 
-- override [ModelSQL./_/_setup/_/_](http://hg.tryton.org/trytond/file/10cfbb9153b6/trytond/model/modelsql.py)
+- override [ModelSQL.\_\_setup\_\_](http://hg.tryton.org/trytond/file/10cfbb9153b6/trytond/model/modelsql.py)
 - hierarchy Model <- ModelStorage <- ModelSQL.
 - adds constraints unique name and code.
 - the "default" order will by first by 'name' and then 'id' (surrogate primary key added to all Models).
 
 
 ##### Table created in PostgreSQL
+(\d+ country_country)
 ```
                                                            Table "public.country_country"
    Column    |              Type              |                          Modifiers                           | Storage  | Stats target | Description
