@@ -54,7 +54,7 @@ suppose to work with/for.
 
     __all__ = ['Country', 'Subdivision', 'Zip']
 
-- \_\_all\_\_ seems to be required, it contains all the Models.
+- \_\_all\_\_ defines the public names by a module in python. [Python reference](https://docs.python.org/2/reference/simple_stmts.html#the-import-statement).
 
 #### Country
 
@@ -65,7 +65,7 @@ suppose to work with/for.
 - Model Country is persisted (ModelSQL) and we have a view/form (ModelView).
 - It's name is country.country (Module country, model country)
 
-        name = fields.Char('Name', required=True, translate=True,
+        Name = fields.Char('Name', required=True, translate=True,
                help='The full name of the country.', select=True)
         code = fields.Char('Code', size=2, select=True,
                help='The ISO country code in two chars.\n'
