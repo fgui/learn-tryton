@@ -49,6 +49,15 @@ suppose to work with/for.
 
 ### country.py
 
+(TODO confirm speculation about all the next points)
+- This contains the Models for this module.
+- A Model in tryton contains the definition of an Entity (Record), for exemple Country defines
+the entities Country. There is a definition of the fields in Country, their constrains,
+how to do some queries etc.
+- A Model gives you the tools to work with the entities. The entities themselves
+in tryton are represented as maps of with key (field name) and value (field value)
+- A Model has most of its logic in class methods and class attributes.
+
 ```python
     from trytond.model import ModelView, ModelSQL, fields
     from trytond.pyson import Eval
@@ -67,7 +76,9 @@ suppose to work with/for.
 ```
 
 - Model Country is persisted (ModelSQL) and we have a view/form (ModelView).
+- hierarchy Model <- ModelStorage <- ModelSQL. Model <- ModelView [Model API](http://doc.tryton.org/3.6/trytond/doc/ref/models/models.html)
 - It's name is country.country (Module country, model country)
+- \_\_name\_\_ unique name to reference the model.
 - By default the \_\_name\_\_ replacing "." with "_" will end up being the table name.
 
 ```python
@@ -86,6 +97,8 @@ suppose to work with/for.
 - translate = True -> translatable, value depends on language context.
 - note: no constraints yet. They will be defined next in a classmethod.
 
+##### setup
+
 ```python
     @classmethod
     def __setup__(cls):
@@ -100,7 +113,6 @@ suppose to work with/for.
 ```
 
 - override [ModelSQL.\_\_setup\_\_](http://hg.tryton.org/trytond/file/10cfbb9153b6/trytond/model/modelsql.py)
-- hierarchy Model <- ModelStorage <- ModelSQL.
 - adds constraints unique name and code.
 - the "default" order will by first by 'name' and then 'id' (surrogate primary key added to all Models).
 
@@ -140,6 +152,8 @@ PostgreSQL [docs](http://www.postgresql.org/docs/current/static/indexes-unique.h
 - TODO find out if there really are 2 indexes per name and code and if they are needed.
 - TODO find out how the table look like in SQLite
 
+##### rec\_name
+
 ```python
     @classmethod
     def search_rec_name(cls, name, clause):
@@ -171,4 +185,32 @@ if "Name" does not exist it will use the surrogate id "id".
             return []
         return [(rec_name,) + tuple(clause[1:])]
 ```
-- In ModelStorage by default it does all if no rec_name found or rec_name.
+
+###### create
+
+- upper case the country code before adding initial elements.
+
+```python
+    @classmethod
+    def create(cls, vlist):
+        vlist = [x.copy() for x in vlist]
+        for vals in vlist:
+            if 'code' in vals and vals['code']:
+                vals['code'] = vals['code'].upper()
+        return super(Country, cls).create(vlist)
+```
+
+###### write
+
+```python
+    @classmethod
+    def write(cls, *args):
+        actions = iter(args)
+        args = []
+        for countries, values in zip(actions, actions):
+            if values.get('code'):
+                values = values.copy()
+                values['code'] = values['code'].upper()
+            args.extend((countries, values))
+        super(Country, cls).write(*args)
+```
