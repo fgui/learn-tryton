@@ -97,6 +97,17 @@ in tryton are represented as maps of with key (field name) and value (field valu
 - select = True -> indexed.
 - translate = True -> translatable, value depends on language context.
 - note: no constraints yet. They will be defined next in a classmethod.
+- notice the last field subdivisions, the equivalent country reference Many2One will be
+defined in Subdivision as well. The Subdivisions doesn't affect the country_country
+table that will be created.
+Code in Subdivision:
+```python
+class Subdivision(ModelSQL, ModelView):
+    "Subdivision"
+    __name__ = 'country.subdivision'
+    country = fields.Many2One('country.country', 'Country',
+            required=True, select=True)
+```
 
 ##### setup
 
