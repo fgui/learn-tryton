@@ -52,9 +52,9 @@ suppose to work with/for.
 (TODO confirm speculation about all the next points)
 - This contains the Models for this module.
 - A Model in tryton contains the definition of an Entity (Record), for exemple Country defines
-the entities Country. There is a definition of the fields in Country, their constrains,
+the entities Country. Th model defines the fields in Country, their constrains,
 how to do some queries etc.
-- A Model gives you the tools to work with the entities. The entities themselves
+- A Model gives you the tools to work with the records. The records themselves
 in tryton are represented as maps of with key (field name) and value (field value)
 - A Model has most of its logic in class methods and class attributes.
 
