@@ -47,16 +47,17 @@ suppose to work with/for.
 
 - register the module 'country' with the Models Country, Subdivision and Zip.
 
-### country.py
+### country.py (Country) ModelSQL/ModelView
 
 (TODO confirm speculation about all the next points)
 - This contains the Models for this module.
 - A Model in tryton contains the definition of an Entity (Record), for exemple Country defines
-the entities Country. Th model defines the fields in Country, their constrains,
+the entities Country. The model defines the fields in Country, their constrains,
 how to do some queries etc.
 - A Model gives you the tools to work with the records. The records themselves
-in tryton are represented as maps of with key (field name) and value (field value)
+in tryton are represented as maps of with key (field name) and value (field value). ??? Or are they instances of the Model???
 - A Model has most of its logic in class methods and class attributes.
+
 
 ```python
     from trytond.model import ModelView, ModelSQL, fields
@@ -213,4 +214,40 @@ if "Name" does not exist it will use the surrogate id "id".
                 values['code'] = values['code'].upper()
             args.extend((countries, values))
         super(Country, cls).write(*args)
+```
+
+### view/country_form.xml
+
+```xml
+<form string="Country">
+    <label name="name"/>
+    <field name="name"/>
+    <label name="code"/>
+    <field name="code"/>
+    <field name="subdivisions" colspan="4"/>
+</form>
+```
+
+### view/country_tree.xml
+
+```xml
+<tree string="Countries">
+    <field name="name"/>
+    <field name="code"/>
+</tree>
+```
+
+### country.xml
+
+```xml
+        <record model="ir.ui.view" id="country_view_form">
+            <field name="model">country.country</field>
+            <field name="type">form</field>
+            <field name="name">country_form</field>
+        </record>
+        <record model="ir.ui.view" id="country_view_tree">
+            <field name="model">country.country</field>
+            <field name="type">tree</field>
+            <field name="name">country_tree</field>
+        </record>
 ```
